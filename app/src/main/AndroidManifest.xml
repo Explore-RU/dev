@@ -22,7 +22,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.BusActivity"></activity>
-        <activity android:name=".activity.DiningActivity"></activity>
     </application>
 
 </manifest>

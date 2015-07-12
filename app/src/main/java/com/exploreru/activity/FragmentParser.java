@@ -11,16 +11,25 @@ import java.util.List;
  */
 public class FragmentParser {
 
-    List<Fragment> fragarray = new ArrayList<Fragment>();
-    List<String> fragtitles = new ArrayList<String>();
+    List<Fragment> fragarray;
+    List<String> fragtitles;
+
+    public FragmentParser(int size){
+        fragarray = new ArrayList<Fragment>();
+        fragtitles = new ArrayList<String>();
+        for(int i = 0;i < size;i++){
+            fragarray.add(null);
+            fragtitles.add(null);
+        }
+    }
 
     public List<Fragment> getFragmentArray(){
         return fragarray;
     }
 
-    public void addFragment(Fragment f, String title){
-        fragarray.add(f);
-        fragtitles.add(title);
+    public void addFragment(Fragment f, String title,int position){
+        fragarray.set(position-1,f);
+        fragtitles.set(position-1,title);
     }
 
     public int getFragmentCount(){

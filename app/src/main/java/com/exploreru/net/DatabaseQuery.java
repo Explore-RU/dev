@@ -1,5 +1,6 @@
 package com.exploreru.net;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -29,42 +30,51 @@ public class DatabaseQuery extends Thread{
     ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
     public String result = "";
     String query = "";
+    Context context = null;
 
-    public DatabaseQuery(String user, String pass, String query){
+    public DatabaseQuery(String user, String pass, String query, Context context){
         nameValuePairs.add(new BasicNameValuePair("user",user));
         nameValuePairs.add(new BasicNameValuePair("pass",pass));
         nameValuePairs.add(new BasicNameValuePair("query",query));
         this.query = query;
+        this.context = context;
     }
 
     @Override public void run() {
 
-        //http post
-        try {
-            HttpClient httpclient = new DefaultHttpClient();
-            Log.i("Database Query","Sending query: "+query);
-            HttpPost httppost = new HttpPost("http://73.10.237.195/query.php");
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            HttpResponse response = httpclient.execute(httppost);
-            HttpEntity entity = response.getEntity();
-            is = entity.getContent();
-        } catch (Exception e) {
-            Log.e("log_tag", "Error in http connection " + e.toString());
-        }
-        //convert response to string
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
+        boolean test1 = HTTPNetwork.isOnline(context);
+        boolean test2 = HTTPNetwork.ping("http://73.10.237.195/query.php",context);
+        if(test1 && test2) {
+            try {
+                HttpClient httpclient = new DefaultHttpClient();
+                Log.i("Database Query", "Sending query: " + query);
+                HttpPost httppost = new HttpPost("http://73.10.237.195/query.php");
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            } catch (Exception e) {
+                Log.e("log_tag", "Error in http connection " + e.toString());
             }
-            is.close();
+            //convert response to string
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                is.close();
 
-            result = sb.toString();
-            Log.i("Database Query","Response to query: "+result);
-        } catch (Exception e) {
-            Log.e("log_tag", "Error converting result " + e.toString());
+                result = sb.toString();
+                Log.i("Database Query", "Response to query: " + result);
+            } catch (Exception e) {
+                Log.e("log_tag", "Error converting result " + e.toString());
+            }
+        } else if(test1 == false) {
+            Log.e("Database Query","Failed: Not online");
+        } else {
+            Log.e("Database Query","Failed: Not reachable");
         }
 
     }

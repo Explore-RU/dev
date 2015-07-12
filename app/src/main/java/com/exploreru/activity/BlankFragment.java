@@ -1,5 +1,6 @@
 package com.exploreru.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,20 +9,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.exploreru.R;
 import com.exploreru.net.DatabaseQuery;
+import com.exploreru.net.HTTPNetwork;
 import com.exploreru.net.JSONParser;
 
 // In this case, the fragment displays simple text based on the page
 public class BlankFragment extends Fragment {
     public static final String ARG_PAGE = "ARG_PAGE";
+    Context context = null;
 
     private int mPage;
-    DatabaseQuery q = new DatabaseQuery("admin","sqldb68","SELECT * FROM Test.test");
+    public DatabaseQuery q;
 
-    public static BlankFragment newInstance(int page) {
+    public static BlankFragment newInstance(int page, Context context) {
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
         BlankFragment fragment = new BlankFragment();
         fragment.setArguments(args);
+        fragment.setContext(context);
+        fragment.q = new DatabaseQuery("admin","sqldb68","SELECT * FROM Test.test",context);
+        fragment.q.start();
         return fragment;
     }
 
@@ -29,8 +35,6 @@ public class BlankFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPage = getArguments().getInt(ARG_PAGE);
-        q.start();
-
     }
 
     @Override
@@ -46,5 +50,9 @@ public class BlankFragment extends Fragment {
         textView.setText(JSONParser.parseBlankFrag(q.result));
         //textView.setText("Fragment #" + mPage);
         return view;
+    }
+
+    public void setContext(Context context){
+        this.context = context;
     }
 }

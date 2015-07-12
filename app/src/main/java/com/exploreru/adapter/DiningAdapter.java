@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.exploreru.R;
 import com.exploreru.api.Dining;
 import com.exploreru.api.Genre;
+import com.exploreru.net.HTTPNetwork;
 
 public class DiningAdapter extends BaseExpandableListAdapter {
 
@@ -46,6 +47,15 @@ public class DiningAdapter extends BaseExpandableListAdapter {
         this._listDataChild = listChildData;
         this.availList = availList;
         this.data = data;
+        if(data == null || HTTPNetwork.isOnline(context) == false){
+            for(int i = 0;i < availList.size();i++){
+                List<Boolean> temp = new ArrayList<Boolean>();
+                for(int j = 0;j < availList.get(i).size();j++){
+                    temp.add(false);
+                }
+                availList.set(i,temp);
+            }
+        }
     }
 
     @Override
@@ -203,6 +213,9 @@ public class DiningAdapter extends BaseExpandableListAdapter {
         if((Boolean)availList.get(groupPosition).get(childPosition-1)) {
             txtListAvail.setText("AVAILABLE");
             txtListAvail.setTextColor(_context.getResources().getColor(R.color.availableText));
+        } else if(data == null || HTTPNetwork.isOnline(_context) == false){
+            txtListAvail.setText("NO NETWORK");
+            txtListAvail.setTextColor(Color.RED);
         } else {
             txtListAvail.setText("UNAVAILABLE");
             txtListAvail.setTextColor(Color.RED);
