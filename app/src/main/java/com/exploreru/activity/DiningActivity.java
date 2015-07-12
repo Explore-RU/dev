@@ -87,8 +87,13 @@ public class DiningActivity extends FragmentActivity {
         network = new Thread(new Runnable() {
             @Override
             public void run() {
-                data = net.getData();
-                dataParsed = JSONParser.parseDiningAPI(data);
+                try {
+                    net.start();
+                    net.join();
+                    dataParsed = JSONParser.parseDiningAPI(net.data);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
             }
         });
         network.start();

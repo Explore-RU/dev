@@ -12,10 +12,11 @@ import org.apache.http.util.EntityUtils;
 /**
  * Created by Sam on 6/2/2015.
  */
-public class HTTPNetwork{
+public class HTTPNetwork extends Thread{
 
     Context c = null;
     String uri = null;
+    public String data = null;
 
     public HTTPNetwork(Context c, String uri){
 
@@ -45,29 +46,28 @@ public class HTTPNetwork{
         }
     }
 
-    public String getData(){
+    @Override public void run(){
 
-        AndroidHttpClient client = AndroidHttpClient.newInstance("AndroidAgent");
-        HttpGet request = new HttpGet(uri);
-        HttpResponse response;
+                AndroidHttpClient client = AndroidHttpClient.newInstance("AndroidAgent");
+                HttpGet request = new HttpGet(uri);
+                HttpResponse response;
 
-        try{
-            if(isOnline()) {
-                response = client.execute(request);
-                return EntityUtils.toString(response.getEntity());
-            } else {
-                return null;
-            }
+                try {
+                    if (isOnline()) {
+                        response = client.execute(request);
+                        data = EntityUtils.toString(response.getEntity());
+                    } else {
+                        data = null;
+                    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    data = null;
 
-        } finally {
-            client.close();
+                } finally {
+                    client.close();
 
-        }
-
+                }
     }
 
     public void setURL(String uri){

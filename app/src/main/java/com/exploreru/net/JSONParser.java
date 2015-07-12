@@ -1,5 +1,7 @@
 package com.exploreru.net;
 
+import android.util.Log;
+
 import com.exploreru.api.Dining;
 import com.exploreru.api.Genre;
 import com.exploreru.api.Meal;
@@ -79,4 +81,20 @@ public class JSONParser {
 
         }
     }
+
+    public static String parseBlankFrag(String data) {
+        //parse json data
+        try {
+            JSONArray jArray = new JSONArray(data);
+            JSONObject json_data = null;
+            for (int i = 0; i < jArray.length(); i++) {
+                json_data = jArray.getJSONObject(i);
+            }
+            return json_data.getString("name");
+        } catch (JSONException e) {
+            Log.e("log_tag", "Error parsing data " + e.toString());
+            return (String) data;
+        }
+    }
+
 }

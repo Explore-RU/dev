@@ -45,13 +45,6 @@ public class DiningFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-/*
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
-        context=activity;
-    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,8 +81,14 @@ public class DiningFragment extends Fragment {
         network = new Thread(new Runnable() {
             @Override
             public void run() {
-                data = net.getData();
-                dataParsed = JSONParser.parseDiningAPI(data);
+                try {
+                    net.start();
+                    net.join();
+                    dataParsed = JSONParser.parseDiningAPI(net.data);
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                    dataParsed = null;
+                }
             }
         });
         network.start();
