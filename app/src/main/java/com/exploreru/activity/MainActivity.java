@@ -19,6 +19,9 @@ import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,40 +39,45 @@ public class MainActivity extends AppCompatActivity {
         //Enter the number of fragments being entered. Used for threading synchronization
         final FragmentParser frag = new FragmentParser(4);
 
-        //ADD FRAGMENT PAGES (ACTIVITIES) HERE:
-        Thread t1 = new Thread(new Runnable() {
+        List<Thread> startupThreads = new ArrayList<Thread>();
+        //ADD FRAGMENT PAGES (ACTIVITIES) HERE, start a new thread each time for start up performance:
+        startupThreads.add(new Thread(new Runnable() {
             @Override
             public void run() {
                 frag.addFragment(DiningFragment.newInstance(context), "Dining",1);
             }
-        });
-        Thread t2 = new Thread(new Runnable() {
+        }));
+        startupThreads.add(new Thread(new Runnable() {
             @Override
             public void run() {
                 frag.addFragment(BlankFragment.newInstance(2,context), "Tab 2",2);
             }
-        });
-        Thread t3 = new Thread(new Runnable() {
+        }));
+        startupThreads.add(new Thread(new Runnable() {
             @Override
             public void run() {
                 frag.addFragment(BlankFragment.newInstance(3,context), "Tab 3",3);
             }
-        });
-        Thread t4 = new Thread(new Runnable() {
+        }));
+        startupThreads.add(new Thread(new Runnable() {
             @Override
             public void run() {
                 frag.addFragment(BlankFragment.newInstance(4,context), "Tab 4",4);
             }
-        });
+        }));
+        //Start the fragment threads and wait for them to load
         try {
-            t1.start();
-            t2.start();
-            t3.start();
-            t4.start();
-            t1.join();
-            t2.join();
-            t3.join();
-            t4.join();
+            for(int i = 0;i < startupThreads.size();i++){
+                startupThreads.get(i).start();
+            }
+            while(startupThreads.isEmpty()==false){
+                for(int i = 0;i < startupThreads.size();i++){
+                    if(startupThreads.get(i).isAlive()==false){
+                        startupThreads.remove(i);
+                        i = 0;
+                    }
+                }
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
